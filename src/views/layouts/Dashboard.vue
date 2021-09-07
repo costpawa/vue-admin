@@ -97,6 +97,16 @@ export default {
           link: '/users',
           icon: 'mdi-account-group'
         },
+        {
+          title: 'Roles',
+          link: '/roles',
+          icon: 'mdi-account-group'
+        },
+        {
+          title: 'Permissions',
+          link: '/permissions',
+          icon: 'mdi-account-group'
+        },
       ],
     }
   },

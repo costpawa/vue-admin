@@ -13,6 +13,9 @@ import Logout from '../views/auth/Logout.vue'
 import Users from '../views/users/Users.vue'
 import ShowUser from '../views/users/Show.vue'
 
+import Roles from '../views/Roles.vue'
+import Permissions from '../views/Permissions.vue'
+
 let users = {
   path: '/users',
   component: DashboardLayout,
@@ -67,6 +70,28 @@ const routes = [
         path: 'dashboard',
         name: 'Dashboard',
         components: { default: Dashboard },
+      }
+    ]
+  },
+  {
+    path: '/roles',
+    component: DashboardLayout,
+    children: [
+      {
+        path: '',
+        name: 'Roles',
+        component: Roles,
+      }
+    ]
+  },
+  {
+    path: '/permissions',
+    component: DashboardLayout,
+    children: [
+      {
+        path: '',
+        name: 'Permissions',
+        component: Permissions,
       }
     ]
   },
