@@ -1,16 +1,14 @@
 <template>
   <div>
-      <ol>
+      <ol class="tw-p-0">
         <li
           v-for="(crumb, index) in crumbs"
           :key="index"
-          property="itemListElement"
-          typeof="ListItem"
-          class="inline"
+          class="tw-float-left tw-mr-1"
         >
-          <NLink property="item" :to="crumb.path" class="breadcrumb-parent-link">
-            <span property="name">{{ $nuxt.$route.fullPath === crumb.path && title !== null ? title : crumb.title }}</span>
-          </NLink>
+          <router-link :to="crumb.path" class="breadcrumb-parent-link">
+            <span class="tw-transition-all">{{ title !== null ? title : crumb.title }}</span>
+          </router-link>
         </li>
       </ol>
   </div>
@@ -19,6 +17,7 @@
 <script>
   import titleCase from 'ap-style-title-case'
   export default {
+    name: 'Breadcrumbs',
     props: {
       title: {
         type: String,
@@ -64,15 +63,15 @@
     font-size: 0.9em;
     color: grey;
     padding: 0 0.0725em 0 0.15em;
-    margin: 0 2px;
+    margin: 0 4px 0 7px;
   }
   li:last-child:after {
     content: '';
   }
-  li a.nuxt-link-exact-active.nuxt-link-active {
+  li a.router-link-exact-active, li a.router-link-active {
     color: grey !important;
   }
-  .breadcrumb-parent-link {
+  li a.router-link-active:hover {
     color: #f56565 !important;
   }
 </style>
