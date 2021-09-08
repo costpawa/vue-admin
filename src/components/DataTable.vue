@@ -30,36 +30,17 @@
               v-bind="attrs"
               v-on="on"
             >
-              New Role
+              New {{title}}
             </v-btn>
           </template>
           <v-card>
             <v-card-title>
-              <span class="text-h5">{{ formTitle }}</span>
+              <span class="text-h5">{{ formTitle + title }}</span>
             </v-card-title>
             <v-card-text>
               <v-container>
                 <v-row>
-                  <v-col
-                    cols="12"
-                    sm="12"
-                    md="12"
-                  >
-                    <v-text-field
-                      v-model="$store.state.editedItem.name"
-                      label="Role Name"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="12"
-                    md="12"
-                  >
-                    <v-text-field
-                      v-model="$store.state.editedItem.permissions"
-                      label="Permissions"
-                    ></v-text-field>
-                  </v-col>
+                  <slot name="fields"></slot>
                 </v-row>
               </v-container>
             </v-card-text>
@@ -72,13 +53,7 @@
               >
                 Cancel
               </v-btn>
-              <v-btn
-                color="blue darken-1"
-                text
-                @click="save"
-              >
-                Save
-              </v-btn>
+              <slot name="saveButton"></slot>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -108,73 +83,19 @@
   import DeleteDialog from "@/components/DeleteDialog.vue";
   export default {
     name: 'DataTable',
+    components: {
+      DeleteDialog,
+    },
+    props: ['title'],
     computed: {
       ...mapGetters([
         'datas',
         'headers',
         'tableSearch',
         'editedIndex',
-        'editedItem',
       ]),
       formTitle () {
-        return this.editedIndex === -1 ? 'New Role' : 'Edit Role'
-      },
-    },
-
-    created () {
-      let initialHeaders = [
-        {
-          text: 'ID',
-          align: 'start',
-          value: 'id',
-        },
-        { text: 'Role Name'   , value: 'name' },
-        { text: 'Permissions' , value: 'permissions' },
-        { text: 'Actions'     , value: 'actions', sortable: false },
-      ]
-
-      let initialDatas = [
-        {
-          id          : 1,
-          name        : 'Admin',
-          permissions : 'All',
-        },
-        {
-          id          : 2,
-          name        : 'Editor',
-          permissions : '',
-        },
-        {
-          id          : 3,
-          name        : 'Member',
-          permissions : '',
-        },
-      ]
-
-      let initialDefaultItem = {
-        id          : 1,
-        name        : '',
-        permissions : '',
-        created_at  : '',
-        updated_at  : '',
-      }
-
-      this.$store.dispatch('changeHeaders', initialHeaders)
-      this.$store.dispatch('changeData', initialDatas)
-      this.$store.dispatch('changeEditedItem', initialDefaultItem)
-      this.$store.dispatch('changeDefaultItem', initialDefaultItem)
-    },
-
-    methods: {
-      save () {
-        let savingItem = {
-          id          : this.datas[this.datas.length - 1].id + 1,
-          name        : this.editedItem.name,
-          permissions : this.editedItem.permissions,
-          created_at  : new Date(Date.now()).toLocaleDateString(),
-          updated_at  : new Date(Date.now()).toLocaleDateString(),
-        }
-        this.$store.dispatch('save', savingItem)
+        return this.editedIndex === -1 ? 'New ' : 'Edit '
       },
     },
   }

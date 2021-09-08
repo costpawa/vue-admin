@@ -108,20 +108,7 @@ export default new Vuex.Store({
     },
 
     save (state) {
-      if (this.editedIndex > -1) {
-        this.$store.dispatch('updateItem')
-      } else {
-        let savingItem = {
-          id: this.datas[this.datas.length - 1].id + 1,
-          name: this.editedItem.name,
-          permissions: this.editedItem.permissions,
-          created_at: new Date(Date.now()).toLocaleDateString(),
-          updated_at: new Date(Date.now()).toLocaleDateString(),
-        }
-        this.$store.dispatch('changeEditedItem', savingItem)
-        this.$store.dispatch('createItem', this.editedItem)
-      }
-      this.$store.dispatch('closeDialog')
+      state.editedItem = {}
     },
   },
 
@@ -175,13 +162,14 @@ export default new Vuex.Store({
       commit('changeDefaultItem', item)
     },
     
-    save ({ dispatch, state }, item) {
+    save ({ commit, dispatch, state }, item) {
       if (state.editedIndex > -1) {
         dispatch('updateItem')
       } else {
         dispatch('createItem', item)
       }
       dispatch('closeDialog')
+      commit('save')
     },
   },
 

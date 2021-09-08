@@ -1,129 +1,53 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="datas"
-    :search="tableSearch"
-    sort-by="id"
-    class="elevation-1"
-  >
-    <template v-slot:top>
-      <v-toolbar
-        flat
+  <DataTable title="Role">
+    <div slot="fields" class="tw-w-full">
+      <v-col
+        cols="12"
+        sm="12"
+        md="12"
       >
         <v-text-field
-          v-model="$store.state.tableSearch"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
+          v-model="$store.state.editedItem.name"
+          label="Role Name"
         ></v-text-field>
-        <v-spacer></v-spacer>
-        <v-dialog
-          v-model="$store.state.dialog"
-          max-width="500px"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              color="primary"
-              dark
-              class="mb-2"
-              v-bind="attrs"
-              v-on="on"
-            >
-              New Role
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-title>
-              <span class="text-h5">{{ formTitle }}</span>
-            </v-card-title>
-            <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col
-                    cols="12"
-                    sm="12"
-                    md="12"
-                  >
-                    <v-text-field
-                      v-model="$store.state.editedItem.name"
-                      label="Role Name"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="12"
-                    md="12"
-                  >
-                    <v-text-field
-                      v-model="$store.state.editedItem.permissions"
-                      label="Permissions"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn
-                color="blue darken-1"
-                text
-                @click="$store.dispatch('closeDialog')"
-              >
-                Cancel
-              </v-btn>
-              <v-btn
-                color="blue darken-1"
-                text
-                @click="save"
-              >
-                Save
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-        <DeleteDialog title="role" />
-      </v-toolbar>
-    </template>
-    <template v-slot:item.actions="{ item }">
-      <v-icon
-        small
-        class="mr-2"
-        @click="$store.dispatch('editItem', item)"
+      </v-col>
+      <v-col
+        cols="12"
+        sm="12"
+        md="12"
       >
-        mdi-pencil
-      </v-icon>
-      <v-icon
-        small
-        @click="$store.dispatch('deleteItem', item)"
+        <v-text-field
+          v-model="$store.state.editedItem.permissions"
+          label="Permissions"
+        ></v-text-field>
+      </v-col>
+    </div>
+    <div slot="saveButton">
+      <v-btn
+        color="blue darken-1"
+        text
+        @click="save"
       >
-        mdi-delete
-      </v-icon>
-    </template>
-  </v-data-table>
+        Save
+      </v-btn>
+    </div>
+  </DataTable> 
 </template>
 
 <script>
   import { mapGetters } from "vuex";
-  import DeleteDialog from "@/components/DeleteDialog.vue";
+  import DataTable from "@/components/DataTable.vue";
   export default {
     name: 'Roles',
     components: {
-      DeleteDialog
+      DataTable,
     },
     computed: {
       ...mapGetters([
         'datas',
-        'headers',
-        'tableSearch',
-        'editedIndex',
         'editedItem',
       ]),
-      formTitle () {
-        return this.editedIndex === -1 ? 'New Role' : 'Edit Role'
-      },
     },
-
     created () {
       let initialHeaders = [
         {
