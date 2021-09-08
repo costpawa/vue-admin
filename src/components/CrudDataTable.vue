@@ -4,6 +4,7 @@
     :items="this['crudDataTable/datas']"
     :search="this['crudDataTable/tableSearch']"
     sort-by="id"
+    dense
     class="elevation-1"
   >
     <template v-slot:top>
@@ -21,6 +22,7 @@
         <v-dialog
           v-model="$store.state.crudDataTable.dialog"
           max-width="500px"
+          persistent
         >
           <template v-slot:activator="{ on, attrs }">
             <v-btn

@@ -43,7 +43,6 @@ const crudDataTable = {
 
     deleteItem (state, item) {
       state.editedIndex = state.datas.indexOf(item)
-      state.editedItem = Object.assign({}, item)
       state.dialogDelete = true
     },
 
@@ -53,13 +52,13 @@ const crudDataTable = {
 
     closeDialog (state) {
       state.dialog = false
-      state.editedItem = Object.assign({}, state.defaultItem)
+      state.editedItem = {}
       state.editedIndex = -1
     },
 
     closeDialogDelete (state) {
       state.dialogDelete = false
-      state.editedItem = Object.assign({}, state.defaultItem)
+      state.editedItem = {}
       state.editedIndex = -1
     },
 
@@ -87,6 +86,10 @@ const crudDataTable = {
       state.editedItem = item
     },
 
+    changeEditedItemPermissions (state, array) {
+      state.editedItem.permissions = array
+    },
+
     changeDefaultItem (state, item) {
       state.defaultItem = item
     },
@@ -112,10 +115,12 @@ const crudDataTable = {
 
     closeDialog ({ commit }) {
       commit('closeDialog')
+      commit('changeEditedItemPermissions', [])
     },
 
     closeDialogDelete ({ commit }) {
       commit('closeDialogDelete')
+      commit('changeEditedItemPermissions', [])
     },
 
     changeData ({ commit }, item) {
@@ -136,6 +141,10 @@ const crudDataTable = {
 
     changeEditedItem ({ commit }, item) {
       commit('changeEditedItem', item)
+    },
+
+    changeEditedItemPermissions ({ commit }, item) {
+      commit('changeEditedItemPermissions', item)
     },
 
     changeDefaultItem ({ commit }, item) {
