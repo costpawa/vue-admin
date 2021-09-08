@@ -1,8 +1,8 @@
 <template>
   <v-data-table
-    :headers="headers"
-    :items="datas"
-    :search="tableSearch"
+    :headers="this['crudDataTable/headers']"
+    :items="this['crudDataTable/datas']"
+    :search="this['crudDataTable/tableSearch']"
     sort-by="id"
     class="elevation-1"
   >
@@ -11,7 +11,7 @@
         flat
       >
         <v-text-field
-          v-model="$store.state.tableSearch"
+          v-model="$store.state.crudDataTable.tableSearch"
           append-icon="mdi-magnify"
           label="Search"
           single-line
@@ -19,7 +19,7 @@
         ></v-text-field>
         <v-spacer></v-spacer>
         <v-dialog
-          v-model="$store.state.dialog"
+          v-model="$store.state.crudDataTable.dialog"
           max-width="500px"
         >
           <template v-slot:activator="{ on, attrs }">
@@ -49,7 +49,7 @@
               <v-btn
                 color="blue darken-1"
                 text
-                @click="$store.dispatch('closeDialog')"
+                @click="$store.dispatch('crudDataTable/closeDialog')"
               >
                 Cancel
               </v-btn>
@@ -64,13 +64,13 @@
       <v-icon
         small
         class="mr-2"
-        @click="$store.dispatch('editItem', item)"
+        @click="$store.dispatch('crudDataTable/editItem', item)"
       >
         mdi-pencil
       </v-icon>
       <v-icon
         small
-        @click="$store.dispatch('deleteItem', item)"
+        @click="$store.dispatch('crudDataTable/deleteItem', item)"
       >
         mdi-delete
       </v-icon>
@@ -82,20 +82,20 @@
   import { mapGetters } from "vuex";
   import DeleteDialog from "@/components/DeleteDialog.vue";
   export default {
-    name: 'DataTable',
+    name: 'CrudDataTable',
     components: {
       DeleteDialog,
     },
     props: ['title'],
     computed: {
       ...mapGetters([
-        'datas',
-        'headers',
-        'tableSearch',
-        'editedIndex',
+        'crudDataTable/datas',
+        'crudDataTable/headers',
+        'crudDataTable/tableSearch',
+        'crudDataTable/editedIndex',
       ]),
       formTitle () {
-        return this.editedIndex === -1 ? 'New ' : 'Edit '
+        return this['crudDataTable/editedIndex'] === -1 ? 'New ' : 'Edit '
       },
     },
   }
