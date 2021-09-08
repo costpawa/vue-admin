@@ -100,12 +100,12 @@ export default {
         {
           title: 'Roles',
           link: '/roles',
-          icon: 'mdi-account-group'
+          icon: 'mdi-account-details'
         },
         {
           title: 'Permissions',
           link: '/permissions',
-          icon: 'mdi-account-group'
+          icon: 'mdi-account-check'
         },
       ],
     }
