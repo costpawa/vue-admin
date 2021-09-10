@@ -2,9 +2,9 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 import Localbase from 'localbase'
 import auth from "@/store/auth";
-import crudDataTable from "@/store/crudDataTable";
 
 let db = new Localbase('db')
+db.config.debug = false
 
 Vue.use(Vuex)
 
@@ -12,11 +12,15 @@ export default new Vuex.Store({
   state: {
     table: null,
     id: null,
-    data: {},
+    data: {
+      permissions: [],
+      color: '#000000FF'
+    },
     datas: [],
     dataIndex: -1,
     headers: {},
     search: null,
+    tableSearch: '',
     dialog: false,
     dialogDelete: false,
   },
@@ -38,12 +42,20 @@ export default new Vuex.Store({
       return state.datas
     },
 
+    dataIndex: state => {
+      return state.dataIndex
+    },
+
     headers: state => {
       return state.headers
     },
 
     search: state => {
       return state.search
+    },
+
+    tableSearch: state => {
+      return state.tableSearch
     },
 
   },
@@ -61,6 +73,17 @@ export default new Vuex.Store({
       state.data = data
     },
 
+    defaultData (state) {
+      state.data = {
+        permissions: [],
+        color: '#000000FF'
+      }
+    },
+
+    dataPermissions (state, array) {
+      state.data.permissions = array
+    },
+
     headers (state, headers) {
       state.headers = headers
     },
@@ -75,23 +98,22 @@ export default new Vuex.Store({
     },
 
     create (state, data) {
-      state.data = data
+      state.datas.push(data)
       state.dialog = false
     },
     
     edit (state, data) {
-      state.data = data
+      state.dataIndex = state.datas.indexOf(data)
+      state.data = Object.assign({}, data)
       state.dialog = true
     },
     
-    update (state, payload) {
-      state.id = payload.id
-      state.data = payload.data
+    update (state) {
+      Object.assign(state.datas[state.dataIndex], state.data)
     },
 
-    delete (state, payload) {
-      state.id = payload.id
-      state.data = payload.data
+    delete (state) {
+      state.datas.splice(state.dataIndex, 1)
     },
 
     deleteMultiple (state, payload) {
@@ -107,9 +129,15 @@ export default new Vuex.Store({
       state.dialog = !state.dialog
     },
 
-    dialogDelete (state, id) {
-      state.id = id
+    dialogDelete (state, data) {
+      state.data = data
+      state.dataIndex = state.datas.indexOf(data)
       state.dialogDelete = !state.dialogDelete
+    },
+
+    dialogClose (state) {
+      state.dialogDelete = false
+      state.dialog = false
     },
 
   },
@@ -130,6 +158,15 @@ export default new Vuex.Store({
       commit('data', data)
     },
     
+    defaultData ({ commit }, data) {
+      // Todo: axios api item actions
+      commit('defaultData', data)
+    },
+
+    dataPermissions ({ commit }, array) {
+      commit('dataPermissions', array)
+    },
+    
     headers ({ commit }, headers) {
       // Todo: axios api item actions
       commit('headers', headers)
@@ -147,12 +184,12 @@ export default new Vuex.Store({
       commit('show', payload)
     },
 
-    create ({ state, commit, dispatch }, data) {
+    create ({ state, commit }, data) {
       // Todo: axios api create actions
       db.collection(state.table).add(data)
-      commit('create', data)
       Vue.nextTick(() => {
-        dispatch('get')
+        commit('create', data)
+        commit('defaultData')
       })
     },
     
@@ -160,19 +197,23 @@ export default new Vuex.Store({
       commit('edit', data)
     },
     
-    update ({ state, commit }, payload) {
+    update ({ state, commit }, data) {
       // Todo: axios api update actions
-      db.collection(state.table).doc({ id: payload.id }).update(payload.data)
-      commit('update', payload)
+      db.collection(state.table).doc({ id: data.id }).update(data)
+      Vue.nextTick(() => {
+        commit('update')
+        commit('defaultData')
+        commit('dialogClose')
+      })
     },
     
-    delete ({ state, dispatch }, id) {
+    delete ({ state, commit, dispatch }, data) {
       // Todo: axios api delete actions
-      db.collection(state.table).doc({ id: id }).delete()
+      db.collection(state.table).doc({ id: data.id }).delete()
       Vue.nextTick(() => {
-        dispatch('dialogDelete')
-        state.datas.splice(state.editedIndex, 1)
-        // dispatch('get')
+        commit('delete')
+        dispatch('dialogDelete', data)
+        commit('defaultData')
       })
     },
     
@@ -190,14 +231,18 @@ export default new Vuex.Store({
       commit('dialog')
     },
     
-    dialogDelete ({ commit }, id) {
-      commit('dialogDelete', id)
+    dialogDelete ({ commit }, data) {
+      commit('dialogDelete', data)
+    },
+    
+    dialogClose ({ commit }) {
+      commit('dialogClose')
+      commit('defaultData')
     },
 
   },
 
   modules: {
-    crudDataTable,
     auth,
   }
 })

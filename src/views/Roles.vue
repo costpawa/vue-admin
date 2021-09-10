@@ -8,7 +8,7 @@
           md="12"
         >
           <v-text-field
-            v-model="$store.state.crudDataTable.editedItem.name"
+            v-model="$store.state.data.name"
             label="Role Name"
           ></v-text-field>
         </v-col>
@@ -18,7 +18,7 @@
           md="12"
         >
           <v-select
-            v-model="$store.state.crudDataTable.editedItem.permissions"
+            v-model="$store.state.data.permissions"
             :items="permissions"
             label="Permissions"
             multiple
@@ -31,7 +31,7 @@
                 @click="toggle"
               >
                 <v-list-item-action>
-                  <v-icon :color="$store.state.crudDataTable.editedItem.permissions.length > 0 ? 'indigo darken-4' : ''">
+                  <v-icon :color="$store.state.data.permissions.length > 0 ? 'indigo darken-4' : ''">
                     {{ selectAllIcon }}
                   </v-icon>
                 </v-list-item-action>
@@ -44,6 +44,24 @@
               <v-divider class="mt-2"></v-divider>
             </template>
           </v-select>
+        </v-col>
+        <v-col
+          cols="12"
+          sm="12"
+          md="12"
+        >
+          <span>Color</span>
+          <v-color-picker
+            v-model="$store.state.data.color"
+            dot-size="42"
+            hide-canvas
+            hide-inputs
+            hide-mode-switch
+            hide-sliders
+            show-swatches
+            swatches-max-height="100"
+            width="full"
+          ></v-color-picker>
         </v-col>
       </div>
       <div slot="saveButton">
@@ -65,7 +83,6 @@
   export default {
     name: 'Roles',
     data: () => ({
-      e7: [],
       permissions: [
         'Show dashboard',
         'List users',
@@ -85,14 +102,15 @@
     },
     computed: {
       ...mapGetters([
-        'crudDataTable/datas',
-        'crudDataTable/editedItem',
+        'data',
+        'datas',
+        'dataIndex',
       ]),
       allPermissions () {
-        return this['crudDataTable/editedItem'].permissions.length === this.permissions.length
+        return this.data.permissions.length === this.permissions.length
       },
       somePermissions () {
-        return this['crudDataTable/editedItem'].permissions.length > 0 && !this.allPermissions
+        return this.data.permissions.length > 0 && !this.allPermissions
       },
       selectAllIcon () {
         if (this.allPermissions) return 'mdi-close-box'
@@ -101,7 +119,8 @@
       },
     },
     created () {
-      let initialHeaders = [
+      this.$store.dispatch('table', 'roles')
+      let headers = [
         {
           text: 'ID',
           align: 'start',
@@ -109,59 +128,38 @@
         },
         { text: 'Role Name'   , value: 'name' },
         { text: 'Permissions' , value: 'permissions' },
+        { text: 'Color'       , value: 'color' },
         { text: 'Actions'     , value: 'actions', sortable: false },
       ]
 
-      let initialDatas = [
-        {
-          id          : 1,
-          name        : 'Admin',
-          permissions : 'All',
-        },
-        {
-          id          : 2,
-          name        : 'Editor',
-          permissions : '',
-        },
-        {
-          id          : 3,
-          name        : 'Member',
-          permissions : '',
-        },
-      ]
-
-      let initialDefaultItem = {
+      let defaultData = {
         id          : 1,
         name        : '',
         permissions : '',
+        color       : '',
         created_at  : '',
         updated_at  : '',
       }
 
-      this.$store.dispatch('crudDataTable/changeHeaders', initialHeaders)
-      this.$store.dispatch('crudDataTable/changeData', initialDatas)
-      this.$store.dispatch('crudDataTable/changeEditedItem', initialDefaultItem)
-      this.$store.dispatch('crudDataTable/changeDefaultItem', initialDefaultItem)
+      this.$store.dispatch('headers', headers)
+      this.$store.dispatch('data', defaultData)
     },
 
     methods: {
       save () {
-        let savingItem = {
-          id          : this['crudDataTable/datas'][this['crudDataTable/datas'].length - 1].id + 1,
-          name        : this['crudDataTable/editedItem'].name,
-          permissions : this['crudDataTable/editedItem'].permissions,
-          created_at  : new Date(Date.now()).toLocaleDateString(),
-          updated_at  : new Date(Date.now()).toLocaleDateString(),
+        if (this.dataIndex > -1) {
+          this.$store.dispatch('update', this.data)
+        } else {
+          this.data.id = this.datas.length === 0 ? 1 : (this.datas[this.datas.length - 1].id + 1)
+          this.$store.dispatch('create', this.data)
         }
-        this.$store.dispatch('crudDataTable/save', savingItem)
-        this.$store.dispatch('crudDataTable/changeEditedItemPermissions', [])
       },
       toggle () {
         this.$nextTick(() => {
           if (this.allPermissions) {
-            this.$store.dispatch('crudDataTable/changeEditedItemPermissions', [])
+            this.$store.dispatch('defaultData')
           } else {
-            this.$store.dispatch('crudDataTable/changeEditedItemPermissions', this.permissions.slice())
+            this.$store.dispatch('dataPermissions', this.permissions.slice())
           }
         })
       },

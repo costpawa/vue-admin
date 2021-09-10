@@ -1,8 +1,8 @@
 <template>
   <v-data-table
-    :headers="this['crudDataTable/headers']"
-    :items="this['crudDataTable/datas']"
-    :search="this['crudDataTable/tableSearch']"
+    :headers="headers"
+    :items="datas"
+    :search="tableSearch"
     sort-by="id"
     dense
     class="elevation-1"
@@ -12,7 +12,7 @@
         flat
       >
         <v-text-field
-          v-model="$store.state.crudDataTable.tableSearch"
+          v-model="$store.state.tableSearch"
           append-icon="mdi-magnify"
           label="Search"
           single-line
@@ -20,7 +20,7 @@
         ></v-text-field>
         <v-spacer></v-spacer>
         <v-dialog
-          v-model="$store.state.crudDataTable.dialog"
+          v-model="$store.state.dialog"
           max-width="500px"
           persistent
         >
@@ -51,7 +51,7 @@
               <v-btn
                 color="blue darken-1"
                 text
-                @click="$store.dispatch('crudDataTable/closeDialog')"
+                @click="$store.dispatch('dialogClose')"
               >
                 Cancel
               </v-btn>
@@ -66,13 +66,13 @@
       <v-icon
         small
         class="mr-2"
-        @click="$store.dispatch('crudDataTable/editItem', item)"
+        @click="$store.dispatch('edit', item)"
       >
         mdi-pencil
       </v-icon>
       <v-icon
         small
-        @click="$store.dispatch('crudDataTable/deleteItem', item)"
+        @click="$store.dispatch('dialogDelete', item)"
       >
         mdi-delete
       </v-icon>
@@ -91,14 +91,17 @@
     props: ['title'],
     computed: {
       ...mapGetters([
-        'crudDataTable/datas',
-        'crudDataTable/headers',
-        'crudDataTable/tableSearch',
-        'crudDataTable/editedIndex',
+        'datas',
+        'headers',
+        'tableSearch',
+        'dataIndex',
       ]),
       formTitle () {
-        return this['crudDataTable/editedIndex'] === -1 ? 'New ' : 'Edit '
+        return this.dataIndex === -1 ? 'New ' : 'Edit '
       },
     },
+    created() {
+      this.$store.dispatch('get')
+    }
   }
 </script>
