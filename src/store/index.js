@@ -90,6 +90,7 @@ export default new Vuex.Store({
 
     get (state, datas) {
       state.datas = datas
+      // console.log(state.datas)
     },
 
     show (state, payload) {
@@ -172,9 +173,10 @@ export default new Vuex.Store({
       commit('headers', headers)
     },
     
-    get ({ state, commit }) {
+    get ({ state, commit }, table) {
       // Todo: axios api get (list) actions
-      db.collection(state.table).get().then(datas => {
+      if(!table) {table = state.table}
+      db.collection(table).get().then(datas => {
         commit('get', datas)
       })
     },

@@ -79,27 +79,19 @@
 
 <script>
   import { mapGetters } from "vuex";
+  import Localbase from 'localbase'
   import CrudDataTable from "@/components/CrudDataTable.vue";
+  let db = new Localbase('db')
+  db.config.debug = false
+
   export default {
     name: 'Roles',
-    data: () => ({
-      permissions: [
-        'Show dashboard',
-        'List users',
-        'Show users',
-        'Create users',
-        'Update users',
-        'Delete users',
-        'List roles',
-        'Show roles',
-        'Create roles',
-        'Update roles',
-        'Delete roles',
-      ],
-    }),
     components: {
       CrudDataTable,
     },
+    data: () => ({
+      permissions: [],
+    }),
     computed: {
       ...mapGetters([
         'data',
@@ -119,6 +111,10 @@
       },
     },
     created () {
+      // this.$store.dispatch('get', 'permissions')
+      db.collection('permissions').get().then(datas => {
+        this.permissions = datas.map(({ name }) => name)
+      })
       this.$store.dispatch('table', 'roles')
       let headers = [
         {
@@ -129,7 +125,7 @@
         { text: 'Role Name'   , value: 'name' },
         { text: 'Permissions' , value: 'permissions' },
         { text: 'Color'       , value: 'color' },
-        { text: 'Actions'     , value: 'actions', sortable: false },
+        { text: 'Actions'     , value: 'actions', align: 'right', sortable: false },
       ]
 
       let defaultData = {
@@ -143,6 +139,7 @@
 
       this.$store.dispatch('headers', headers)
       this.$store.dispatch('data', defaultData)
+        // console.log(this.$store.state.datas)
     },
 
     methods: {
