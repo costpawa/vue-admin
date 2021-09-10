@@ -1,6 +1,6 @@
 <template>
   <v-card>
-    <CrudDataTable title="Permission">
+    <CrudDataTable title="Permission" :itemsPerPage="15">
       <div slot="fields" class="tw-w-full">
         <v-col
           cols="12"

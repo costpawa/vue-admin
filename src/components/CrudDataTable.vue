@@ -6,6 +6,7 @@
     sort-by="id"
     dense
     class="elevation-1"
+    :items-per-page="itemsPerPage"
   >
     <template v-slot:top>
       <v-toolbar
@@ -88,7 +89,13 @@
     components: {
       DeleteDialog,
     },
-    props: ['title'],
+    props: {
+      title: String,
+      itemsPerPage: {
+        type: Number,
+        default: -1
+      },
+    },
     computed: {
       ...mapGetters([
         'datas',
