@@ -124,7 +124,7 @@
         },
         { text: 'Role Name'   , value: 'name' },
         { text: 'Permissions' , value: 'permissions' },
-        { text: 'Color'       , value: 'color' },
+        { text: 'Color'       , value: 'color', align: 'center' },
         { text: 'Actions'     , value: 'actions', align: 'right', sortable: false },
       ]
 

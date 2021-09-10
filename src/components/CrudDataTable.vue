@@ -63,6 +63,14 @@
         <DeleteDialog title="role" />
       </v-toolbar>
     </template>
+    <template v-slot:item.color="{ item }">
+      <v-chip
+        :color="item.color"
+        dark
+      >
+        {{ item.color }}
+      </v-chip>
+    </template>
     <template v-slot:item.actions="{ item }">
       <v-icon
         small
