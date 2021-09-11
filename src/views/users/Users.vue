@@ -1,266 +1,231 @@
 <template>
-  <v-data-table
-    :headers="headers"
-    :items="users"
-    :search="search"
-    sort-by="calories"
-    class="elevation-1"
-  >
-    <template v-slot:top>
-      <v-toolbar
-        flat
-      >
+  <v-card>
+    <CrudDataTable title="User" :itemsPerPage="15">
+      <div slot="fields" class="tw-w-full">
+        <v-row>
+          <v-col
+            cols="12"
+            sm="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="$store.state.data.email"
+              label="Email"
+            ></v-text-field>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="$store.state.data.username"
+              label="Username"
+            ></v-text-field>
+          </v-col>
+        </v-row>
 
-        <v-text-field
-          v-model="search"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
-        ></v-text-field>
+        <v-row>
+          <v-col
+            cols="12"
+            sm="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="$store.state.data.password"
+              label="Password"
+            ></v-text-field>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="$store.state.data.confirmPassword"
+              label="Confirm Password"
+            ></v-text-field>
+          </v-col>
+        </v-row>
 
-        <v-spacer></v-spacer>
+        <v-row>
+          <v-col
+            cols="12"
+            sm="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="$store.state.data.name"
+              label="Name"
+            ></v-text-field>
+          </v-col>
+          <v-col
+            cols="12"
+            sm="12"
+            md="6"
+          >
+            <v-text-field
+              v-model="$store.state.data.surname"
+              label="Surname"
+            ></v-text-field>
+          </v-col>
+        </v-row>
 
-        <v-dialog
-          v-model="dialog"
-          max-width="500px"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              color="primary"
-              dark
-              class="mb-2"
-              v-bind="attrs"
-              v-on="on"
+        <v-row>
+          <v-col
+            cols="12"
+            sm="12"
+            md="12"
+          >
+            <v-select
+              v-model="$store.state.data.role"
+              :items="role"
+              label="Role"
+              persistent-hint
             >
-              New User
-            </v-btn>
-          </template>
-          <v-card>
-            <v-card-title>
-              <span class="text-h5">{{ formTitle }}</span>
-            </v-card-title>
-
-            <v-card-text>
-              <v-container>
-                <v-row>
-                  <v-col
-                    cols="12"
-                    sm="12"
-                    md="12"
-                  >
-                    <v-text-field
-                      v-model="editedItem.username"
-                      label="Username"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="12"
-                    md="12"
-                  >
-                    <v-text-field
-                      v-model="editedItem.email"
-                      label="Email"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col
-                    cols="12"
-                    sm="12"
-                    md="12"
-                  >
-                    <v-text-field
-                      v-model="editedItem.password"
-                      label="Password"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
-              </v-container>
-            </v-card-text>
-
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn
-                color="blue darken-1"
-                text
-                @click="close"
-              >
-                Cancel
-              </v-btn>
-              <v-btn
-                color="blue darken-1"
-                text
-                @click="save"
-              >
-                Save
-              </v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-        <v-dialog v-model="dialogDelete" max-width="500px">
-          <v-card>
-            <v-card-title class="text-h5">Are you sure you want to delete this item?</v-card-title>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn color="blue darken-1" text @click="closeDelete">Cancel</v-btn>
-              <v-btn color="blue darken-1" text @click="deleteItemConfirm">OK</v-btn>
-              <v-spacer></v-spacer>
-            </v-card-actions>
-          </v-card>
-        </v-dialog>
-      </v-toolbar>
-    </template>
-    <template v-slot:item.actions="{ item }">
-      <v-icon
-        small
-        class="mr-2"
-        @click="editItem(item)"
-      >
-        mdi-pencil
-      </v-icon>
-      <v-icon
-        small
-        @click="deleteItem(item)"
-      >
-        mdi-delete
-      </v-icon>
-    </template>
-  </v-data-table>
+            </v-select>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col
+            cols="12"
+            sm="12"
+            md="12"
+          >
+            <v-select
+              v-model="$store.state.data.permissions"
+              :items="permissions"
+              label="Permissions"
+              multiple
+              chips
+              hint="Select if you want to define additional permissions for this user"
+              persistent-hint
+            >
+              <template v-slot:prepend-item>
+                <v-list-item
+                  ripple
+                  @click="toggle"
+                >
+                  <v-list-item-action>
+                    <v-icon :color="$store.state.data.permissions.length > 0 ? 'indigo darken-4' : ''">
+                      {{ selectAllIcon }}
+                    </v-icon>
+                  </v-list-item-action>
+                  <v-list-item-content>
+                    <v-list-item-title>
+                      Select All
+                    </v-list-item-title>
+                  </v-list-item-content>
+                </v-list-item>
+                <v-divider class="mt-2"></v-divider>
+              </template>
+            </v-select>
+          </v-col>
+        </v-row>
+      </div>
+      <div slot="saveButton">
+        <v-btn
+          color="blue darken-1"
+          text
+          @click="save"
+        >
+          Save
+        </v-btn>
+      </div>
+    </CrudDataTable>
+  </v-card>
 </template>
 
 <script>
+  import { mapGetters } from "vuex";
+  import Localbase from 'localbase'
+  import CrudDataTable from "@/components/CrudDataTable.vue";
+  let db = new Localbase('db')
+  db.config.debug = false
+
   export default {
+    name: 'Users',
+    components: {
+      CrudDataTable,
+    },
+    
     data: () => ({
-      dialog: false,
-      dialogDelete: false,
-      search: '',
-      headers: [
-        {
-          text: '#',
-          align: 'start',
-          value: 'no',
-        },
-        { text: 'ID'        , value: 'id' },
-        { text: 'Username'  , value: 'username' },
-        { text: 'Email'     , value: 'email' },
-        { text: 'Created At', value: 'created_at' },
-        { text: 'Updated At', value: 'updated_at' },
-        { text: 'Actions'   , value: 'actions', sortable: false },
-      ],
-      users: [],
-      editedIndex: -1,
-      editedItem: {
-        no: 1,
-        id: 1,
-        username: '',
-        email: '',
-        created_at: '',
-        updated_at: '',
-      },
-      defaultItem: {
-        no: 1,
-        id: 1,
-        username: '',
-        email: '',
-        created_at: '',
-        updated_at: '',
-      },
+      role: null,
+      permissions: [],
     }),
 
     computed: {
-      formTitle () {
-        return this.editedIndex === -1 ? 'New User' : 'Edit User'
+      ...mapGetters([
+        'data',
+        'datas',
+        'dataIndex',
+      ]),
+      allPermissions () {
+        return this.data.permissions.length === this.permissions.length
       },
-    },
-
-    watch: {
-      dialog (val) {
-        val || this.close()
+      somePermissions () {
+        return this.data.permissions.length > 0 && !this.allPermissions
       },
-      dialogDelete (val) {
-        val || this.closeDelete()
+      selectAllIcon () {
+        if (this.allPermissions) return 'mdi-close-box'
+        if (this.somePermissions) return 'mdi-minus-box'
+        return 'mdi-checkbox-blank-outline'
       },
     },
 
     created () {
-      this.initialize()
+      db.collection('roles').get().then(datas => {
+        this.role = datas.map(({ name }) => name)
+      })
+      db.collection('permissions').get().then(datas => {
+        this.permissions = datas.map(({ name }) => name)
+      })
+      this.$store.dispatch('table', 'users')
+      let headers = [
+        { text: 'ID',           value: 'id', align: 'start', },
+        { text: 'Name',         value: 'name', },
+        { text: 'Surname',      value: 'surname', },
+        { text: 'Username',     value: 'username' },
+        { text: 'Email',        value: 'email' },
+        { text: 'Role',         value: 'role' },
+        { text: 'Permissions',  value: 'permissions' },
+        { text: 'Actions',      value: 'actions', align: 'right', sortable: false },
+      ]
+
+      let defaultData = {
+        id          : 1,
+        name        : '',
+        surname     : '',
+        username    : '',
+        email       : '',
+        role        : '',
+        permissions : '',
+        created_at  : '',
+        updated_at  : '',
+      }
+
+      this.$store.dispatch('headers', headers)
+      this.$store.dispatch('data', defaultData)
     },
 
     methods: {
-      initialize () {
-        this.users = [
-          {
-            no: 1,
-            id: 1,
-            username: 'admin',
-            email: 'admin@hotmail.com',
-            created_at: '2021-09-06',
-            updated_at: '2021-09-06',
-          },
-          {
-            no: 2,
-            id: 2,
-            username: 'hakan',
-            email: 'hakan_dnz_000@hotmail.com',
-            created_at: '2021-09-06',
-            updated_at: '2021-09-06',
-          },
-          {
-            no: 3,
-            id: 3,
-            username: 'editor',
-            email: 'editor@hotmail.com',
-            created_at: '2021-09-06',
-            updated_at: '2021-09-06',
-          },
-        ]
-      },
-
-      editItem (item) {
-        this.editedIndex = this.users.indexOf(item)
-        this.editedItem = Object.assign({}, item)
-        this.dialog = true
-      },
-
-      deleteItem (item) {
-        this.editedIndex = this.users.indexOf(item)
-        this.editedItem = Object.assign({}, item)
-        this.dialogDelete = true
-      },
-
-      deleteItemConfirm () {
-        this.users.splice(this.editedIndex, 1)
-        this.closeDelete()
-      },
-
-      close () {
-        this.dialog = false
-        this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.editedIndex = -1
-        })
-      },
-
-      closeDelete () {
-        this.dialogDelete = false
-        this.$nextTick(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.editedIndex = -1
-        })
-      },
-
       save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.users[this.editedIndex], this.editedItem)
+        if (this.dataIndex > -1) {
+          this.$store.dispatch('update', this.data)
         } else {
-          this.editedItem.no = this.users.length
-          this.editedItem.id = this.users.length
-          this.editedItem.created_at = new Date(Date.now()).toLocaleDateString()
-          this.editedItem.updated_at = new Date(Date.now()).toLocaleDateString()
-          this.users.push(this.editedItem)
+          this.data.id = this.datas.length === 0 ? 1 : (this.datas[this.datas.length - 1].id + 1)
+          this.$store.dispatch('create', this.data)
         }
-        this.close()
       },
-    },
+      toggle () {
+        this.$nextTick(() => {
+          if (this.allPermissions) {
+            this.$store.dispatch('defaultData')
+          } else {
+            this.$store.dispatch('dataPermissions', this.permissions.slice())
+          }
+        })
+      },
+    }
   }
 </script>

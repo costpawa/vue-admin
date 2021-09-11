@@ -80,15 +80,11 @@
     created () {
       this.$store.dispatch('table', 'permissions')
       let headers = [
-        { text: 'ID', value: 'id', },
-        {
-          text: 'Permission',
-          align: 'start',
-          value: 'name',
-        },
-        { text: 'Slug', value: 'slug', },
-        { text: 'Category', value: 'category' },
-        { text: 'Actions'     , value: 'actions', align: 'right', sortable: false },
+        { text: 'ID',         value: 'id', },
+        { text: 'Permission', value: 'name', align: 'start', },
+        { text: 'Slug',       value: 'slug', },
+        { text: 'Category',   value: 'category' },
+        { text: 'Actions',    value: 'actions', align: 'right', sortable: false },
       ]
 
       let defaultData = {

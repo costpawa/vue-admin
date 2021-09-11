@@ -91,7 +91,11 @@
 
 <script>
   import { mapGetters } from "vuex";
+  import Localbase from 'localbase'
   import DeleteDialog from "@/components/DeleteDialog.vue";
+  let db = new Localbase('db')
+  db.config.debug = false
+
   export default {
     name: 'CrudDataTable',
     components: {
@@ -104,6 +108,7 @@
         default: -1
       },
     },
+
     computed: {
       ...mapGetters([
         'datas',
@@ -115,6 +120,7 @@
         return this.dataIndex === -1 ? 'New ' : 'Edit '
       },
     },
+
     created() {
       this.$store.dispatch('get')
     }

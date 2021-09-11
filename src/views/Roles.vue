@@ -89,9 +89,11 @@
     components: {
       CrudDataTable,
     },
+
     data: () => ({
       permissions: [],
     }),
+
     computed: {
       ...mapGetters([
         'data',
@@ -110,8 +112,8 @@
         return 'mdi-checkbox-blank-outline'
       },
     },
+
     created () {
-      // this.$store.dispatch('get', 'permissions')
       db.collection('permissions').get().then(datas => {
         this.permissions = datas.map(({ name }) => name)
       })
@@ -139,7 +141,6 @@
 
       this.$store.dispatch('headers', headers)
       this.$store.dispatch('data', defaultData)
-        // console.log(this.$store.state.datas)
     },
 
     methods: {

@@ -13,6 +13,7 @@ export default new Vuex.Store({
     table: null,
     id: null,
     data: {
+      role: null,
       permissions: [],
       color: '#000000FF'
     },
@@ -23,6 +24,7 @@ export default new Vuex.Store({
     tableSearch: '',
     dialog: false,
     dialogDelete: false,
+    roleColor: '',
   },
 
   getters: {
@@ -75,6 +77,7 @@ export default new Vuex.Store({
 
     defaultData (state) {
       state.data = {
+        role: null,
         permissions: [],
         color: '#000000FF'
       }
@@ -139,6 +142,10 @@ export default new Vuex.Store({
     dialogClose (state) {
       state.dialogDelete = false
       state.dialog = false
+    },
+
+    getRoleColor (state, role) {
+      state.roleColor = role.color
     },
 
   },
@@ -240,6 +247,12 @@ export default new Vuex.Store({
     dialogClose ({ commit }) {
       commit('dialogClose')
       commit('defaultData')
+    },
+    
+    getRoleColor ({ commit }, role) {
+      db.collection('roles').doc({ name: role }).get().then(role => {
+        commit('getRoleColor', role)
+      })
     },
 
   },
