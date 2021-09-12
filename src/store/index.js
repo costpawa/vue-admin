@@ -131,17 +131,20 @@ export default new Vuex.Store({
 
     dialog (state) {
       state.dialog = !state.dialog
+      state.dataIndex = -1
     },
 
     dialogDelete (state, data) {
       state.data = data
       state.dataIndex = state.datas.indexOf(data)
       state.dialogDelete = !state.dialogDelete
+      state.dataIndex = -1
     },
 
     dialogClose (state) {
       state.dialogDelete = false
       state.dialog = false
+      state.dataIndex = -1
     },
 
     getRoleColor (state, role) {
