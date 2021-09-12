@@ -17,28 +17,7 @@
           </router-link>
         </v-list-item-content>
       </v-list-item>
-
-      <v-list
-        dense
-        nav
-        class="tw-pt-0"
-      >
-        <v-list-item
-          v-for="item in items"
-          :key="item.title"
-          :to="item.link"
-          link
-          class="menu-links tw-text-trueGray-550 tw-my-2 tw-h-auto"
-        >
-          <v-list-item-icon class="tw-bg-sideBar-800 tw-h-auto tw-p-1.5 tw-rounded-md tw-my-1 tw-mr-2">
-            <v-icon class="menu-icons tw-text-trueGray-550 tw-font-extralight">{{ item.icon }}</v-icon>
-          </v-list-item-icon>
-
-          <v-list-item-content>
-            <v-list-item-title class="menu-texts tw-text-sm tw-transition-all">{{ item.title }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-      </v-list>
+      <Menu :items="menuLinks" />
     </v-navigation-drawer>
     <v-app-bar
       app
@@ -68,6 +47,29 @@
         <v-icon >mdi-dots-vertical</v-icon>
       </v-btn>
     </v-app-bar>
+    <v-expand-transition>
+      <v-card
+        v-show="settings"
+        class="mx-auto tw-absolute tw-top-16 tw-right-0 tw-bg-sideBar-700 tw-text-trueGray-550 tw-border-0 tw-rounded-b-md tw-rounded-t-none tw-z-10"
+      >
+        <div>
+          <v-navigation-drawer
+          dark
+            class="tw-bg-transparent tw-w-full"
+          >
+            <v-divider></v-divider>
+            <router-link to="/" class="profile">
+              <img src="@/assets/img/profile.jpg" alt="profile.jpg" class="profile-img">
+              <span>Hakan Sarıaslan</span>
+              <v-icon color="grey" class="tw-w-4">mdi-circle-small</v-icon>
+              <span class="tw-text-red-500 tw-font-medium">Admin</span>
+            </router-link>
+            <v-divider></v-divider>
+            <Menu :items="profileLinks" />
+          </v-navigation-drawer>
+        </div>
+      </v-card>
+    </v-expand-transition>
     <v-main>
       <router-view class="tw-p-4"></router-view>
     </v-main>
@@ -76,17 +78,19 @@
 
 <script>
 import { mapGetters } from "vuex";
+import Menu from '@/components/Menu.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 export default {
   name: 'Layout',
   components: {
+    Menu,
     Breadcrumbs,
   },
   data () {
     return {
       drawer: null,
-      settings: null,
-      items: [
+      settings: false,
+      menuLinks: [
         {
           title: 'Dashboard',
           link: '/dashboard',
@@ -108,6 +112,18 @@ export default {
           icon: 'mdi-account-check'
         },
       ],
+      profileLinks: [
+        {
+          title: 'Profile',
+          link: '/',
+          icon: 'mdi-account'
+        },
+        {
+          title: 'Logout',
+          link: '/logout',
+          icon: 'mdi-logout'
+        },
+      ],
     }
   },
   computed: {
@@ -124,9 +140,5 @@ export default {
 <style scoped>
 .v-application {
   font-family: Quicksand !important
-}
-
-.v-list-item--active .menu-texts, .v-list-item--active .menu-icons {
-  color: #EF4444 !important;
 }
 </style>
