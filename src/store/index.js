@@ -96,9 +96,8 @@ export default new Vuex.Store({
       // console.log(state.datas)
     },
 
-    show (state, payload) {
-      state.id = payload.id
-      state.data = payload.data
+    show (state, data) {
+      state.data = data
     },
 
     create (state, data) {
@@ -185,15 +184,27 @@ export default new Vuex.Store({
     
     get ({ state, commit }, table) {
       // Todo: axios api get (list) actions
-      if(!table) {table = state.table}
+      if(!table) {
+        table = state.table
+      }
       db.collection(table).get().then(datas => {
         commit('get', datas)
       })
     },
     
-    show ({ state, commit }, payload) {
+    show ({ state, commit, dispatch }, payload) {
       // Todo: axios api show actions
-      commit('show', payload)
+      let table = payload.table
+      let id = payload.id
+      if(!table) {
+        table = state.table
+      }
+      if(!id) {
+        id = state.id
+      }
+      db.collection(table).doc({ id: id }).get().then(data => {
+        commit('show', data)
+      })
     },
 
     create ({ state, commit }, data) {
@@ -217,6 +228,11 @@ export default new Vuex.Store({
         commit('defaultData')
         commit('dialogClose')
       })
+    },
+    
+    showUpdate ({ state }, data) {
+      // Todo: axios api update actions
+      db.collection(state.table).doc({ id: data.id }).update(data)
     },
     
     delete ({ state, commit, dispatch }, data) {

@@ -10,6 +10,8 @@ import Login from '../views/auth/Login.vue'
 import ForgetPassword from '../views/auth/ForgetPassword.vue'
 import Logout from '../views/auth/Logout.vue'
 
+import Profile from '../views/Profile.vue'
+
 import Users from '../views/users/Users.vue'
 import ShowUser from '../views/users/Show.vue'
 
@@ -70,6 +72,17 @@ const routes = [
         path: 'dashboard',
         name: 'Dashboard',
         components: { default: Dashboard },
+      }
+    ]
+  },
+  {
+    path: '/profile',
+    component: DashboardLayout,
+    children: [
+      {
+        path: '',
+        name: 'Profile',
+        component: Profile,
       }
     ]
   },

@@ -25,20 +25,16 @@
       class="tw-h-16 tw-bg-sideBar-800 tw-text-trueGray-550"
     >
       <v-app-bar-nav-icon @click="drawer = !drawer" color="grey"></v-app-bar-nav-icon>
-
       <v-toolbar-title class="tw-pl-0 tw-text-base">
         <Breadcrumbs />
       </v-toolbar-title>
-
       <v-spacer></v-spacer>
-
       <v-btn
         icon
         color="grey"
       >
         <v-icon>mdi-magnify</v-icon>
       </v-btn>
-
       <v-btn
         icon
         color="grey" 
@@ -58,20 +54,20 @@
             class="tw-bg-transparent tw-w-full"
           >
             <v-divider></v-divider>
-            <router-link to="/" class="profile">
+            <router-link to="/profile" class="profile" @click="settings = false">
               <img src="@/assets/img/profile.jpg" alt="profile.jpg" class="profile-img">
               <span>Hakan Sarıaslan</span>
               <v-icon color="grey" class="tw-w-4">mdi-circle-small</v-icon>
               <span class="tw-text-red-500 tw-font-medium">Admin</span>
             </router-link>
             <v-divider></v-divider>
-            <Menu :items="profileLinks" />
+            <Menu :items="profileLinks" @click="settings = false" />
           </v-navigation-drawer>
         </div>
       </v-card>
     </v-expand-transition>
     <v-main>
-      <router-view class="tw-p-4"></router-view>
+      <router-view class="tw-p-4 tw-shadow-none"></router-view>
     </v-main>
   </v-app>
 </template>
@@ -115,7 +111,7 @@ export default {
       profileLinks: [
         {
           title: 'Profile',
-          link: '/',
+          link: '/profile',
           icon: 'mdi-account'
         },
         {
