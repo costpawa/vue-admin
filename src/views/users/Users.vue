@@ -214,6 +214,7 @@
           this.$store.dispatch('update', this.data)
         } else {
           this.data.id = this.datas.length === 0 ? 1 : (this.datas[this.datas.length - 1].id + 1)
+          this.data.rememberMe = false
           this.$store.dispatch('create', this.data)
         }
       },

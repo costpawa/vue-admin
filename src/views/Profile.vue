@@ -33,8 +33,12 @@
               md="6"
             >
               <v-text-field
-                v-model="profileDatas.email"
                 label="Email"
+                required
+                v-model="profileDatas.email"
+                :error-messages="emailErrors"
+                @input="$v.profileDatas.email.$touch()"
+                @blur="$v.profileDatas.email.$touch()"
               ></v-text-field>
             </v-col>
             <v-col
@@ -43,8 +47,11 @@
               md="6"
             >
               <v-text-field
-                v-model="profileDatas.username"
                 label="Username"
+                v-model="profileDatas.username"
+                :error-messages="usernameErrors"
+                @input="$v.profileDatas.username.$touch()"
+                @blur="$v.profileDatas.username.$touch()"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -56,8 +63,11 @@
               md="6"
             >
               <v-text-field
-                v-model="profileDatas.password"
                 label="Password"
+                v-model="profileDatas.password"
+                :error-messages="passwordErrors"
+                @input="$v.profileDatas.password.$touch()"
+                @blur="$v.profileDatas.password.$touch()"
               ></v-text-field>
             </v-col>
             <v-col
@@ -66,8 +76,11 @@
               md="6"
             >
               <v-text-field
-                v-model="profileDatas.confirmPassword"
                 label="Confirm Password"
+                v-model="profileDatas.confirmPassword"
+                :error-messages="confirmPasswordErrors"
+                @input="$v.profileDatas.confirmPassword.$touch()"
+                @blur="$v.profileDatas.confirmPassword.$touch()"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -79,8 +92,11 @@
               md="6"
             >
               <v-text-field
-                v-model="profileDatas.name"
                 label="Name"
+                v-model="profileDatas.name"
+                :error-messages="nameErrors"
+                @input="$v.profileDatas.name.$touch()"
+                @blur="$v.profileDatas.name.$touch()"
               ></v-text-field>
             </v-col>
             <v-col
@@ -89,8 +105,11 @@
               md="6"
             >
               <v-text-field
-                v-model="profileDatas.surname"
                 label="Surname"
+                v-model="profileDatas.surname"
+                :error-messages="surnameErrors"
+                @input="$v.profileDatas.surname.$touch()"
+                @blur="$v.profileDatas.surname.$touch()"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -102,10 +121,10 @@
               md="6"
             >
               <v-select
-                v-model="profileDatas.role"
-                :items="roles"
                 label="Role"
                 persistent-hint
+                v-model="profileDatas.role"
+                :items="roles"
               >
               </v-select>
             </v-col>
@@ -115,13 +134,13 @@
               md="6"
             >
               <v-select
-                v-model="profileDatas.permissions"
-                :items="permissions"
                 label="Permissions"
+                hint="Select if you want to define additional permissions for this user"
                 multiple
                 chips
-                hint="Select if you want to define additional permissions for this user"
                 persistent-hint
+                v-model="profileDatas.permissions"
+                :items="permissions"
               >
                 <template v-slot:prepend-item>
                   <v-list-item
@@ -148,7 +167,14 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="primary" class="tw-mr-3" @click="save">Save</v-btn>
+        <v-btn
+          color="primary"
+          class="tw-mr-3"
+          @click="save"
+          :loading="loading"
+        >
+          Save
+        </v-btn>
       </v-card-actions>
       <v-alert
         dense
@@ -156,8 +182,17 @@
         class="tw-mx-4 tw-mt-3"
         v-model="success"
         dismissible
+        transition="scale-transition"
       >
-        Profile edited.
+        Profile updated.
+      </v-alert>
+      <v-alert
+        :value="error"
+        type="error"
+        transition="scale-transition"
+        style="margin-top: 20px; position: absolute; width:100%;"
+      >
+        {{ errors.message }}
       </v-alert>
     </v-card>
   </div>
@@ -165,6 +200,8 @@
 
 <script>
   import { mapGetters } from "vuex";
+  import { validationMixin } from 'vuelidate'
+  import { required, minLength, maxLength, email, } from 'vuelidate/lib/validators'
   import Localbase from 'localbase'
   import UserRecords from '@/components/UserRecords.vue';
 
@@ -177,8 +214,23 @@
       UserRecords,
     },
 
+    mixins: [validationMixin],
+    validations: {
+      profileDatas: {
+        email:            { required, minLength: minLength(3) , maxLength: maxLength(30), email },
+        username:         { required, minLength: minLength(3) , maxLength: maxLength(20) },
+        password:         { required, minLength: minLength(3) , maxLength: maxLength(20) },
+        confirmPassword:  { required, minLength: minLength(3) , maxLength: maxLength(20) },
+        name:             { required, minLength: minLength(3) , maxLength: maxLength(20) },
+        surname:          { required, minLength: minLength(3) , maxLength: maxLength(20) },
+      }
+    },
+
     data: () => ({
       success: false,
+      error: false,
+      loader: null,
+      loading: false,
       records: [
         {
           title: 'Posts',
@@ -213,7 +265,64 @@
         'data',
         'datas',
         'dataIndex',
+        'errors',
       ]),
+
+      emailErrors () {
+        const errors = []
+        if (!this.$v.profileDatas.email.$dirty) return errors
+        !this.$v.profileDatas.email.minLength && errors.push('Email must be minimum 3 characters long')
+        !this.$v.profileDatas.email.maxLength && errors.push('Email must be at most 30 characters long')
+        !this.$v.profileDatas.email.required && errors.push('Email is required.')
+        !this.$v.profileDatas.email.email && errors.push('Email must be a valid email.')
+        return errors
+      },
+
+      usernameErrors () {
+        const errors = []
+        if (!this.$v.profileDatas.username.$dirty) return errors
+        !this.$v.profileDatas.username.minLength && errors.push('Username must be minimum 3 characters long')
+        !this.$v.profileDatas.username.maxLength && errors.push('Username must be at most 20 characters long')
+        !this.$v.profileDatas.username.required && errors.push('Username is required.')
+        return errors
+      },
+
+      passwordErrors () {
+        const errors = []
+        if (!this.$v.profileDatas.password.$dirty) return errors
+        !this.$v.profileDatas.password.minLength && errors.push('Password must be minimum 3 characters long')
+        !this.$v.profileDatas.password.maxLength && errors.push('Password must be at most 20 characters long')
+        !this.$v.profileDatas.password.required && errors.push('Password is required.')
+        return errors
+      },
+
+      confirmPasswordErrors () {
+        const errors = []
+        if (!this.$v.profileDatas.confirmPassword.$dirty) return errors
+        !this.$v.profileDatas.confirmPassword.minLength && errors.push('Confirm Password must be minimum 3 characters long')
+        !this.$v.profileDatas.confirmPassword.maxLength && errors.push('Confirm Password must be at most 20 characters long')
+        !this.$v.profileDatas.confirmPassword.required && errors.push('Confirm Password is required.')
+        return errors
+      },
+
+      nameErrors () {
+        const errors = []
+        if (!this.$v.profileDatas.name.$dirty) return errors
+        !this.$v.profileDatas.name.minLength && errors.push('Name must be minimum 3 characters long')
+        !this.$v.profileDatas.name.maxLength && errors.push('Name must be at most 20 characters long')
+        !this.$v.profileDatas.name.required && errors.push('Name is required.')
+        return errors
+      },
+
+      surnameErrors () {
+        const errors = []
+        if (!this.$v.profileDatas.surname.$dirty) return errors
+        !this.$v.profileDatas.surname.minLength && errors.push('Surname must be minimum 3 characters long')
+        !this.$v.profileDatas.surname.maxLength && errors.push('Surname must be at most 20 characters long')
+        !this.$v.profileDatas.surname.required && errors.push('Surname is required.')
+        return errors
+      },
+
       allPermissions () {
         return this.data.permissions.length === this.permissions.length
       },
@@ -241,22 +350,30 @@
         id: 1,
       })
       setTimeout(() => {
-        this.profileDatas.id                  = this.data.id
-        this.profileDatas.email               = this.data.email
-        this.profileDatas.username            = this.data.username
-        this.profileDatas.password            = this.data.password
-        this.profileDatas.confirmPassword     = this.data.confirmPassword
-        this.profileDatas.name                = this.data.name
-        this.profileDatas.surname             = this.data.surname
-        this.profileDatas.role                = this.data.role
-        this.profileDatas.permissions         = this.data.permissions
+        this.profileDatas.id              = this.data.id
+        this.profileDatas.email           = this.data.email
+        this.profileDatas.username        = this.data.username
+        this.profileDatas.password        = this.data.password
+        this.profileDatas.confirmPassword = this.data.confirmPassword
+        this.profileDatas.name            = this.data.name
+        this.profileDatas.surname         = this.data.surname
+        this.profileDatas.role            = this.data.role
+        this.profileDatas.permissions     = this.data.permissions
       }, 500)
     },
 
     methods: {
       save () {
-        this.$store.dispatch('showUpdate', this.profileDatas)
-        this.success = true
+        this.success = false
+        this.$v.$touch()
+        if (this.$v.$invalid) {
+        } else {
+          this.loader = 'loading';
+          setTimeout(() => {
+            this.$store.dispatch('showUpdate', this.profileDatas)
+            this.success = true
+          }, 500)
+        }
       },
       toggle () {
         this.$nextTick(() => {
@@ -267,6 +384,57 @@
           }
         })
       },
-    }
+    },
+    watch: {
+      loader () {
+        const l = this.loader
+        this[l] = !this[l]
+
+        setTimeout(() => (this[l] = false), 500)
+
+        this.loader = null
+      },
+    },
   }
 </script>
+
+<style scoped>
+
+  .custom-loader {
+    animation: loader 1s infinite;
+    display: flex;
+  }
+  @-moz-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @-webkit-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @-o-keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes loader {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+</style>

@@ -25,6 +25,7 @@ export default new Vuex.Store({
     dialog: false,
     dialogDelete: false,
     roleColor: '',
+    errors: [],
   },
 
   getters: {
@@ -58,6 +59,10 @@ export default new Vuex.Store({
 
     tableSearch: state => {
       return state.tableSearch
+    },
+
+    errors: state => {
+      return state.errors
     },
 
   },
@@ -114,6 +119,10 @@ export default new Vuex.Store({
     update (state) {
       Object.assign(state.datas[state.dataIndex], state.data)
     },
+    
+    showUpdate (state, data) {
+      state.data = data
+    },
 
     delete (state) {
       state.datas.splice(state.dataIndex, 1)
@@ -148,6 +157,10 @@ export default new Vuex.Store({
 
     getRoleColor (state, role) {
       state.roleColor = role.color
+    },
+
+    errors(state, errors) {
+      state.errors = errors
     },
 
   },
@@ -230,9 +243,10 @@ export default new Vuex.Store({
       })
     },
     
-    showUpdate ({ state }, data) {
+    showUpdate ({ state, commit }, data) {
       // Todo: axios api update actions
       db.collection(state.table).doc({ id: data.id }).update(data)
+      commit('showUpdate', data)
     },
     
     delete ({ state, commit, dispatch }, data) {
@@ -272,6 +286,10 @@ export default new Vuex.Store({
       db.collection('roles').doc({ name: role }).get().then(role => {
         commit('getRoleColor', role)
       })
+    },
+
+    pushError({ commit }, errors) {
+      commit('errors', errors)
     },
 
   },
