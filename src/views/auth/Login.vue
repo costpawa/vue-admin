@@ -136,6 +136,17 @@
         return errors
       },
     },
+    created() {
+      let token = localStorage.getItem('token')
+      if(typeof(token) !== 'undefined' && token !== null && token !== 'null' && token !== '') {
+        this.$router.push("/")
+      } else {
+        token = sessionStorage.getItem('token')
+        if(typeof(token) !== 'undefined' && token !== null && token !== 'null' && token !== '') {
+          this.$router.push("/")
+        }
+      }
+    },
     watch: {
       loader () {
         const l = this.loader

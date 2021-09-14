@@ -13,7 +13,7 @@
     }),
     created() {
       this.$store.dispatch('auth/logout', this.user).then(() => {
-        this.$router.push('/')
+        this.$router.push('/login')
       })
     }
   };

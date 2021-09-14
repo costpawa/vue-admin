@@ -126,8 +126,12 @@ export default {
     ...mapGetters(['auth/login']),
   },
   created() {
-    if(this['auth/login'] === false) {
-      // this.$router.push("/login")
+    let token = localStorage.getItem('token')
+    if(typeof(token) === 'undefined' || token === null || token === 'null' || token === '') {
+      token = sessionStorage.getItem('token')
+      if(typeof(token) === 'undefined' || token === null || token === 'null' || token === '') {
+        this.$router.push("/login")
+      }
     }
   }
 };

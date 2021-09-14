@@ -1,17 +1,13 @@
+import Vue from 'vue'
+import Localbase from 'localbase'
+
+let db = new Localbase('db')
+db.config.debug = false
+
 const auth = {
   namespaced: true,
 
   state: () => ({
-    dummyUser: {
-      'id'          : 1,
-      'username'    : 'hakan',
-      'password'    : '123456',
-      'email'       : 'costpawa2@gmail.com',
-      'remember_me' : false,
-      'roles'       : 'admin',
-      'permissions' : 'all',
-      'image'       : 'hakan.jpg',
-    },
     login           : false,
     username        : null,
     password        : null,
@@ -94,27 +90,42 @@ const auth = {
   },
 
   actions: {
-    login({ state, commit }, credentials) {
+    login({ commit }, credentials) {
       return new Promise((resolve, reject) => {
-        let user = state.dummyUser
-        if((credentials.username === user.username || credentials.username === user.email) && credentials.password === user.password) {
-          commit('resetLoginAttempts', user)
-          commit('login', user)
-          resolve('/')
-        } else {
-          let errors = {
-            'code'    : 401,
-            'message' : 'Invalid credentials',
+        db.collection('users').doc({ username: credentials.username, password: credentials.password }).get()
+        .then(user => {
+          if(typeof(user) !== 'undefined') {
+            let token = Vue.helpers.makeHash(64)
+            if(credentials.rememberMe === true) {
+              user.rememberMe = true
+              localStorage.setItem('token', token)
+              sessionStorage.removeItem('token')
+            } else {
+              sessionStorage.setItem('token', token)
+              localStorage.removeItem('token')
+            }
+            // console.log(user)
+            // commit('resetLoginAttempts', user)
+            commit('login', user)
+            resolve('/')
+          } else {
+            let errors = {
+              'code'    : 401,
+              'message' : 'Invalid credentials',
+            }
+            commit('invalidLogin', errors)
+            reject(errors)
           }
-          commit('invalidLogin', errors)
-          commit('increaseLoginAttempt', user)
-          // console.log(errors)
-          reject(errors)
-        }
+        })
+        .catch(error => {
+          reject(error)
+        })
       })
     },
 
     logout({ commit }, user) {
+      localStorage.removeItem('token')
+      sessionStorage.removeItem('token')
       commit('logout', user)
     },
 
