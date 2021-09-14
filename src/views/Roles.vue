@@ -117,7 +117,7 @@
       db.collection('permissions').get().then(datas => {
         this.permissions = datas.map(({ name }) => name)
       })
-      this.$store.dispatch('table', 'roles')
+      this.$store.dispatch('get', 'roles')
       let headers = [
         {
           text: 'ID',

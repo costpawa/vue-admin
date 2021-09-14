@@ -78,10 +78,12 @@
             md="12"
           >
             <v-select
-              v-model="$store.state.data.role"
-              :items="role"
               label="Role"
               persistent-hint
+              v-model="$store.state.data.roles"
+              :items="selectRoles"
+              item-text="name"
+              item-value="id"
             >
             </v-select>
           </v-col>
@@ -93,13 +95,15 @@
             md="12"
           >
             <v-select
-              v-model="$store.state.data.permissions"
-              :items="permissions"
               label="Permissions"
               multiple
               chips
               hint="Select if you want to define additional permissions for this user"
               persistent-hint
+              v-model="$store.state.data.permissions"
+              :items="permissions"
+              item-text="name"
+              item-value="id"
             >
               <template v-slot:prepend-item>
                 <v-list-item
@@ -150,8 +154,8 @@
     },
     
     data: () => ({
-      role: null,
-      permissions: [],
+      selectRoles : [],
+      permissions : [],
     }),
 
     computed: {
@@ -175,21 +179,20 @@
 
     created () {
       db.collection('roles').get().then(datas => {
-        this.role = datas.map(({ name }) => name)
+        this.selectRoles = datas
       })
       db.collection('permissions').get().then(datas => {
-        this.permissions = datas.map(({ name }) => name)
+        this.permissions = datas
       })
-      this.$store.dispatch('table', 'users')
       let headers = [
         { text: 'ID',           value: 'id', align: 'start', },
         { text: 'Name',         value: 'name', },
         { text: 'Surname',      value: 'surname', },
         { text: 'Username',     value: 'username' },
         { text: 'Email',        value: 'email' },
-        { text: 'Role',         value: 'role' },
-        { text: 'Permissions',  value: 'permissions' },
-        { text: 'Actions',      value: 'actions', align: 'right', sortable: false },
+        { text: 'Role(s)',      value: 'roles' },
+        { text: 'Permissions',  value: 'permissions', sortable: false },
+        { text: 'Actions',      value: 'actions',     sortable: false, align: 'right' },
       ]
 
       let defaultData = {
@@ -198,18 +201,22 @@
         surname     : '',
         username    : '',
         email       : '',
-        role        : '',
-        permissions : '',
-        created_at  : '',
-        updated_at  : '',
+        selectRoles : [],
+        permissions : [],
       }
 
       this.$store.dispatch('headers', headers)
       this.$store.dispatch('data', defaultData)
+      
+      this.$store.dispatch('getWithRelations', {
+        table: 'users',
+        relations: ['roles']
+      })
     },
 
     methods: {
       save () {
+        // console.log(this.data)
         if (this.dataIndex > -1) {
           this.$store.dispatch('update', this.data)
         } else {

@@ -63,6 +63,17 @@
         <DeleteDialog title="role" />
       </v-toolbar>
     </template>
+    <template v-slot:item.roles="{ item }">
+      <v-chip
+        :color="item.roles.color"
+        dark
+      >
+        {{ item.roles.name }}
+      </v-chip>
+    </template>
+    <template v-slot:item.permissions="{ item }">
+      {{ item.permissions.name }}
+    </template>
     <template v-slot:item.color="{ item }">
       <v-chip
         :color="item.color"
@@ -120,9 +131,5 @@
         return this.dataIndex === -1 ? 'New ' : 'Edit '
       },
     },
-
-    created() {
-      this.$store.dispatch('get')
-    }
   }
 </script>

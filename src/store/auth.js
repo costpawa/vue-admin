@@ -48,6 +48,7 @@ const auth = {
 
   mutations: {
     login(state, payload) {
+      // state.login = payload
       state.login = {
         'id'          : payload.id,
         'username'    : payload.username,

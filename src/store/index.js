@@ -12,11 +12,7 @@ export default new Vuex.Store({
   state: {
     table: null,
     id: null,
-    data: {
-      role: null,
-      permissions: [],
-      color: '#000000FF'
-    },
+    data: {},
     datas: [],
     dataIndex: -1,
     headers: {},
@@ -24,7 +20,6 @@ export default new Vuex.Store({
     tableSearch: '',
     dialog: false,
     dialogDelete: false,
-    roleColor: '',
     errors: [],
   },
 
@@ -81,11 +76,7 @@ export default new Vuex.Store({
     },
 
     defaultData (state) {
-      state.data = {
-        role: null,
-        permissions: [],
-        color: '#000000FF'
-      }
+      state.data = {}
     },
 
     dataPermissions (state, array) {
@@ -155,10 +146,6 @@ export default new Vuex.Store({
       state.dataIndex = -1
     },
 
-    getRoleColor (state, role) {
-      state.roleColor = role.color
-    },
-
     errors(state, errors) {
       state.errors = errors
     },
@@ -203,6 +190,23 @@ export default new Vuex.Store({
       db.collection(table).get().then(datas => {
         commit('get', datas)
       })
+    },
+    
+    getWithRelations ({ state, commit }, payload) {
+      // Todo: axios api get (list) actions
+      if(!payload.table) {
+        payload.table = state.table
+      }
+      db.collection(payload.table).get().then(datas => {
+        datas.forEach((data) => {
+          let relations = String(payload.relations)
+          db.collection(relations).doc({ id: data[relations] }).get().then(relationDatas => {
+            data[relations] = relationDatas
+          })
+        })
+        commit('get', datas)
+      })
+      console.log(state.data)
     },
     
     show ({ state, commit, dispatch }, payload) {
@@ -282,12 +286,6 @@ export default new Vuex.Store({
       commit('defaultData')
     },
     
-    getRoleColor ({ commit }, role) {
-      db.collection('roles').doc({ name: role }).get().then(role => {
-        commit('getRoleColor', role)
-      })
-    },
-
     pushError({ commit }, errors) {
       commit('errors', errors)
     },

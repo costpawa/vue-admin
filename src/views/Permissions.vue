@@ -78,7 +78,7 @@
     },
 
     created () {
-      this.$store.dispatch('table', 'permissions')
+      this.$store.dispatch('get', 'permissions')
       let headers = [
         { text: 'ID',         value: 'id', },
         { text: 'Permission', value: 'name', align: 'start', },
