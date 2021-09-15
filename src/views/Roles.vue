@@ -18,12 +18,14 @@
           md="12"
         >
           <v-select
-            v-model="$store.state.data.permissions"
-            :items="permissions"
             label="Permissions"
             multiple
             chips
             persistent-hint
+            v-model="$store.state.data.permissions"
+            :items="permissions"
+            item-text="name"
+            item-value="id"
           >
             <template v-slot:prepend-item>
               <v-list-item
@@ -92,6 +94,7 @@
 
     data: () => ({
       permissions: [],
+      selectedPermissions: [],
     }),
 
     computed: {
@@ -111,13 +114,30 @@
         if (this.somePermissions) return 'mdi-minus-box'
         return 'mdi-checkbox-blank-outline'
       },
+      selectAll: {
+        get: function () {
+          return this.permissions ? this.selectedPermissions.length == this.permissions.length : false;
+        },
+        set: function (value) {
+          let selectedPermissions = [];
+          if (value) {
+            this.permissions.forEach(function (permission) {
+              selectedPermissions.push(permission.id);
+            });
+          }
+          this.selectedPermissions = selectedPermissions;
+        }
+      }
     },
 
     created () {
       db.collection('permissions').get().then(datas => {
-        this.permissions = datas.map(({ name }) => name)
+        this.permissions = datas
       })
-      this.$store.dispatch('get', 'roles')
+      this.$store.dispatch('table', 'roles')
+      this.$store.dispatch('getWithRelations', {
+        relations: ['permissions']
+      })
       let headers = [
         {
           text: 'ID',
@@ -157,7 +177,15 @@
           if (this.allPermissions) {
             this.$store.dispatch('defaultData')
           } else {
-            this.$store.dispatch('dataPermissions', this.permissions.slice())
+            // this.selectAll
+            let permissions = []
+            this.permissions.forEach(permission => {
+              permissions.push(permission.id)
+            })
+
+            // console.log(permissions)
+
+            this.$store.dispatch('dataPermissions', permissions)
           }
         })
       },

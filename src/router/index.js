@@ -14,6 +14,7 @@ import Profile from '../views/Profile.vue'
 
 import Users from '../views/users/Users.vue'
 import ShowUser from '../views/users/Show.vue'
+import NewUser from '../views/users/New.vue'
 
 import Roles from '../views/Roles.vue'
 import Permissions from '../views/Permissions.vue'
@@ -26,6 +27,11 @@ let users = {
       path: '',
       name: 'Users',
       component: Users
+    },
+    {
+      path: 'new',
+      name: 'NewUser',
+      component: NewUser
     },
     {
       path: ':id',

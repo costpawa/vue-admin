@@ -12,14 +12,6 @@
       <v-toolbar
         flat
       >
-        <v-text-field
-          v-model="$store.state.tableSearch"
-          append-icon="mdi-magnify"
-          label="Search"
-          single-line
-          hide-details
-        ></v-text-field>
-        <v-spacer></v-spacer>
         <v-dialog
           v-model="$store.state.dialog"
           max-width="500px"
@@ -60,19 +52,35 @@
             </v-card-actions>
           </v-card>
         </v-dialog>
+        <v-spacer></v-spacer>
+        <v-text-field
+          v-model="$store.state.tableSearch"
+          append-icon="mdi-magnify"
+          label="Search"
+          single-line
+          hide-details
+        ></v-text-field>
         <DeleteDialog title="role" />
       </v-toolbar>
     </template>
     <template v-slot:item.roles="{ item }">
       <v-chip
-        :color="item.roles.color"
+        v-for="(role, idx) in item.roles"
+        :key="idx"
+        :color="role.color"
         dark
       >
-        {{ item.roles.name }}
+        {{ role.name }}
       </v-chip>
     </template>
     <template v-slot:item.permissions="{ item }">
-      {{ item.permissions.name }}
+      <span
+        v-for="(permission, idx) in item.permissions"
+        :key="idx"
+        class="tw-bg-gray-200 tw-mx-1 tw-py-1 tw-px-2 tw-rounded-full"
+      >
+        {{ permission.name }}
+      </span>
     </template>
     <template v-slot:item.color="{ item }">
       <v-chip

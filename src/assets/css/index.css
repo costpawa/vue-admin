@@ -39,4 +39,12 @@
   .profile-links {
     @apply tw-flex tw-gap-1 tw-items-center tw-text-trueGray-550 tw-my-1 !important
   }
+
+  .back {
+    @apply tw-text-trueGray-600 tw-transition-all hover:tw-text-red-500 !important
+  }
+
+  .back:hover .v-icon {
+    @apply tw-text-red-500 !important
+  }
 }

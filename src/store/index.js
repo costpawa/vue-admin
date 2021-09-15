@@ -188,6 +188,7 @@ export default new Vuex.Store({
         table = state.table
       }
       db.collection(table).get().then(datas => {
+        // console.log(datas)
         commit('get', datas)
       })
     },
@@ -198,15 +199,44 @@ export default new Vuex.Store({
         payload.table = state.table
       }
       db.collection(payload.table).get().then(datas => {
+        // 2 rows (users)
         datas.forEach((data) => {
-          let relations = String(payload.relations)
-          db.collection(relations).doc({ id: data[relations] }).get().then(relationDatas => {
-            data[relations] = relationDatas
+          // 2 times (roles, permissions)
+          payload.relations.forEach((relation) => {
+            // console.log(data[relation])
+            relation = String(relation)
+            if(data[relation].length > 0) {
+              let dataArray = []
+              // minimum: 1, maximum 11 times (each roles or permissions defined to the user)
+              data[relation].forEach((field) => {
+                db.collection(relation).doc({ id: field }).get().then(relationDatas => {
+                  dataArray.push(relationDatas)
+                  // console.log(relationDatas.name)
+                })
+              })
+              data[relation] = dataArray
+              // console.log(data[relation])
+              // console.log(dataArray)
+              // dataArray = []
+            } else {
+              let dataArray = []
+              // console.log(relation)
+              db.collection(relation).doc({ id: data[relation] }).get().then(relationDatas => {
+                console.log(Vue.helpers.isNull(relationDatas))
+                if(Vue.helpers.isNull(relationDatas)) {
+                  data[relation] = relationDatas
+                } else {
+                  console.log(relationDatas)
+                  dataArray.push(relationDatas)
+                  data[relation] = dataArray
+                }
+              })
+            }
           })
         })
         commit('get', datas)
+        // console.log(datas)
       })
-      console.log(state.data)
     },
     
     show ({ state, commit, dispatch }, payload) {
@@ -226,6 +256,7 @@ export default new Vuex.Store({
 
     create ({ state, commit }, data) {
       // Todo: axios api create actions
+      // console.log(data)
       db.collection(state.table).add(data)
       Vue.nextTick(() => {
         commit('create', data)
@@ -234,6 +265,7 @@ export default new Vuex.Store({
     },
     
     edit ({ commit }, data) {
+      console.log(data)
       commit('edit', data)
     },
     
@@ -288,6 +320,20 @@ export default new Vuex.Store({
     
     pushError({ commit }, errors) {
       commit('errors', errors)
+    },
+    
+    getLastId({}, table) {
+      return new Promise((resolve, reject) => {
+        db.collection(table).orderBy('id', 'desc').limit(1).get()
+        .then(data => {
+          resolve(data[0].id).then((value) => {
+            return value
+          })
+        })
+        .catch(error => {
+          reject(error)
+        })
+      })
     },
 
   },
