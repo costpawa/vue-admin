@@ -106,6 +106,7 @@
     },
 
     created () {
+      this.$store.dispatch('table', 'users')
       this.$store.dispatch('getWithRelations', {
         table: 'users',
         relations: ['roles', 'permissions']

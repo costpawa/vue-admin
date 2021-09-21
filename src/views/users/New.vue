@@ -18,6 +18,7 @@
             >
               <v-text-field
                 label="Email"
+                type="email"
                 v-model="user.email"
                 :error-messages="emailErrors"
                 @input="$v.user.email.$touch()"
@@ -44,6 +45,7 @@
             >
               <v-text-field
                 label="Password"
+                type="password"
                 v-model="user.password"
                 :error-messages="passwordErrors"
                 @input="$v.user.password.$touch()"
@@ -57,6 +59,7 @@
             >
               <v-text-field
                 label="Confirm Password"
+                type="password"
                 v-model="user.confirmPassword"
                 :error-messages="confirmPasswordErrors"
                 @input="$v.user.confirmPassword.$touch()"
@@ -162,6 +165,7 @@
             <v-btn
               @click="save"
               :loading="loading"
+              :disabled="$v.$invalid"
               color="primary"
               class="tw-w-full"
             >
@@ -178,7 +182,7 @@
         dismissible
         transition="scale-transition"
       >
-        Profile updated.
+        User created.
       </v-alert>
     </v-card>
   </div>
@@ -187,7 +191,7 @@
 <script>
   import { mapGetters } from "vuex";
   import { validationMixin } from 'vuelidate'
-  import { required, minLength, maxLength, email, } from 'vuelidate/lib/validators'
+  import { required, minLength, maxLength, email, sameAs } from 'vuelidate/lib/validators'
   import Localbase from 'localbase'
   let db = new Localbase('db')
   db.config.debug = false
@@ -217,7 +221,7 @@
         email:            { required, minLength: minLength(3) , maxLength: maxLength(30), email, },
         username:         { required, minLength: minLength(3) , maxLength: maxLength(20), },
         password:         { required, minLength: minLength(3) , maxLength: maxLength(20), },
-        confirmPassword:  { required, minLength: minLength(3) , maxLength: maxLength(20), },
+        confirmPassword:  { sameAsPassword: sameAs('password') },
         name:             { required, minLength: minLength(3) , maxLength: maxLength(20), },
         surname:          { required, minLength: minLength(3) , maxLength: maxLength(20), },
         roles:            { required, },
@@ -261,9 +265,7 @@
       confirmPasswordErrors () {
         const errors = []
         if (!this.$v.user.confirmPassword.$dirty) return errors
-        !this.$v.user.confirmPassword.minLength && errors.push('Confirm Password must be minimum 3 characters long')
-        !this.$v.user.confirmPassword.maxLength && errors.push('Confirm Password must be at most 20 characters long')
-        !this.$v.user.confirmPassword.required && errors.push('Confirm Password is required.')
+        !this.$v.user.confirmPassword.sameAsPassword && errors.push('Passwords must be identical')
         return errors
       },
 
@@ -333,9 +335,11 @@
       toggle () {
         this.$nextTick(() => {
           if (this.allPermissions) {
-            this.$store.dispatch('defaultData')
+            this.user.permissions = ""
           } else {
-            this.$store.dispatch('dataPermissions', this.permissions.slice())
+            this.user.permissions = this.permissions.slice()
+            this.user.permissions = this.permissions.map(({ id }) => id)
+            console.log(this.user.permissions)
           }
         })
       },

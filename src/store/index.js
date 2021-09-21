@@ -222,11 +222,11 @@ export default new Vuex.Store({
               let dataArray = []
               // console.log(relation)
               db.collection(relation).doc({ id: data[relation] }).get().then(relationDatas => {
-                console.log(Vue.helpers.isNull(relationDatas))
+                // console.log(Vue.helpers.isNull(relationDatas))
                 if(Vue.helpers.isNull(relationDatas)) {
                   data[relation] = relationDatas
                 } else {
-                  console.log(relationDatas)
+                  // console.log(relationDatas)
                   dataArray.push(relationDatas)
                   data[relation] = dataArray
                 }
@@ -265,7 +265,7 @@ export default new Vuex.Store({
     },
     
     edit ({ commit }, data) {
-      console.log(data)
+      // console.log(data)
       commit('edit', data)
     },
     
