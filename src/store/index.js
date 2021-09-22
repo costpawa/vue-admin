@@ -115,8 +115,9 @@ export default new Vuex.Store({
       state.data = data
     },
 
-    delete (state) {
-      state.datas.splice(state.dataIndex, 1)
+    delete (state, index) {
+      // console.log(index)
+      state.datas.splice(index, 1)
     },
 
     deleteMultiple (state, payload) {
@@ -235,7 +236,7 @@ export default new Vuex.Store({
           })
         })
         commit('get', datas)
-        // console.log(datas)
+        console.log(datas)
       })
     },
     
@@ -287,11 +288,14 @@ export default new Vuex.Store({
     
     delete ({ state, commit, dispatch }, data) {
       // Todo: axios api delete actions
+      // console.log(data)
       db.collection(state.table).doc({ id: data.id }).delete()
       Vue.nextTick(() => {
-        commit('delete')
+        state.dataIndex = state.datas.indexOf(data)
+        commit('delete', state.dataIndex)
         dispatch('dialogDelete', data)
         commit('defaultData')
+        // console.log(state.datas)
       })
     },
     
@@ -310,6 +314,7 @@ export default new Vuex.Store({
     },
     
     dialogDelete ({ commit }, data) {
+      // console.log(data)
       commit('dialogDelete', data)
     },
     

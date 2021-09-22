@@ -8,7 +8,7 @@
     </div>
     <v-card class="elevation-1 tw-mt-2">
       <v-card-title class="tw-flex tw-items-center tw-gap-3">
-        <span class="text-h5 tw-ml-2">New User</span>
+        <span class="text-h5 tw-ml-2">Edit User</span>
       </v-card-title>
       <v-card-text>
         <v-container>
@@ -172,7 +172,6 @@
             <v-btn
               @click="save"
               :loading="loading"
-              :disabled="$v.$invalid"
               color="primary"
               class="tw-w-full"
             >
@@ -189,13 +188,14 @@
         dismissible
         transition="scale-transition"
       >
-        User created. <router-link :to="`/users/${user.id}`" class="success-links">Show the user</router-link> | <router-link to="/users" class="success-links">Return to users list</router-link>
+        User updated. <router-link :to="`/users/${user.id}`" class="success-links">Show the user</router-link> | <router-link to="/users" class="success-links">Return to users list</router-link>
       </v-alert>
     </v-card>
   </div>
 </template>
 
 <script>
+  import { mapGetters } from 'vuex'
   import { validationMixin } from 'vuelidate'
   import { required, minLength, maxLength, email, sameAs } from 'vuelidate/lib/validators'
   import Localbase from 'localbase'
@@ -235,6 +235,10 @@
     },
 
     computed: {
+      ...mapGetters([
+        'data',
+      ]),
+
       emailErrors () {
         const errors = []
         if (!this.$v.user.email.$dirty) return errors
@@ -309,11 +313,17 @@
     },
 
     created() {
+      const userIdFromPath = parseInt(this.$route.fullPath.split('/')[2])
+      this.user.id = userIdFromPath
       db.collection('roles').get().then(roles => {
         this.roles = roles
       })
       db.collection('permissions').get().then(permissions => {
         this.permissions = permissions
+      })
+      db.collection('users').doc({id: userIdFromPath}).get().then(user => {
+        // console.log(user)
+        this.user = user
       })
     },
 
@@ -324,26 +334,10 @@
         if (!this.$v.$invalid) {
           this.loader = 'loading';
           setTimeout(() => {
-            db.collection('users').orderBy('id', 'desc').limit(1).get()
-            .then(data => {
-              this.user.id = data[0].id + 1
-              this.$store.dispatch('table', 'users')
-              this.$store.dispatch('create', this.user)
-            })
-            .then(() => {
-              this.success = true
-              this.user = {
-                id                  : this.user.id,
-                name                : '',
-                surname             : '',
-                username            : '',
-                email               : '',
-                roles               : [],
-                permissions         : "",
-                rememberMe          : false,
-              }
-              this.$v.$reset()
-            })
+            this.$store.dispatch('table', 'users')
+            this.$store.dispatch('showUpdate', this.user)
+            this.success = true
+            this.$v.$reset()
           }, 500)
         }
       },

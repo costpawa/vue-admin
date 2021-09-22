@@ -29,7 +29,7 @@
             single-line
             hide-details
           ></v-text-field>
-          <DeleteDialog title="role" />
+          <DeleteDialog title="user" />
         </v-toolbar>
       </template>
       <template v-slot:item.roles="{ item }">
@@ -52,19 +52,13 @@
         </span>
       </template>
       <template v-slot:item.actions="{ item }">
-        <v-icon
-          small
-          class="mr-2"
-          @click="$store.dispatch('edit', item)"
-        >
-          mdi-pencil
-        </v-icon>
-        <v-icon
-          small
-          @click="$store.dispatch('dialogDelete', item)"
-        >
-          mdi-delete
-        </v-icon>
+        <router-link :to="`/users/${item.id}`" class="mr-2">
+          <v-icon small title="Show" class="hover:tw-text-blue-500">mdi-eye</v-icon>
+        </router-link>
+        <router-link :to="`/users/${item.id}/edit`" class="mr-2">
+          <v-icon small title="Edit" class="hover:tw-text-green-500">mdi-pencil</v-icon>
+        </router-link>
+        <v-icon small title="Delete" @click="$store.dispatch('dialogDelete', item)" class="hover:tw-text-red-500">mdi-delete</v-icon>
       </template>
     </v-data-table>
   </v-card>
@@ -85,7 +79,7 @@
     
     data: () => ({
       headers : [
-        { text: 'ID',           value: 'id', align: 'start', },
+        { text: 'ID',           value: 'id', },
         { text: 'Name',         value: 'name', },
         { text: 'Surname',      value: 'surname', },
         { text: 'Username',     value: 'username' },
@@ -99,9 +93,7 @@
 
     computed: {
       ...mapGetters([
-        'data',
         'datas',
-        'dataIndex',
       ]),
     },
 

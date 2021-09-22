@@ -41,10 +41,31 @@
   }
 
   .back {
-    @apply tw-text-trueGray-600 tw-transition-all hover:tw-text-red-500 !important
+    @apply tw-text-trueGray-600 tw-transition-all hover:tw-text-indigo-500 !important
   }
 
   .back:hover .v-icon {
+    @apply tw-text-indigo-500 !important
+  }
+
+  .edit {
+    @apply tw-text-trueGray-600 tw-transition-all hover:tw-text-green-500 !important
+  }
+
+  .edit:hover .v-icon {
+    @apply tw-text-green-500 !important
+  }
+
+  .delete {
+    @apply tw-text-trueGray-600 tw-transition-all hover:tw-text-red-500 !important
+  }
+
+  .delete:hover .v-icon {
     @apply tw-text-red-500 !important
   }
+
+  .success-links {
+    @apply tw-text-white tw-underline tw-transition-all hover:tw-text-red-500 !important
+  }
+  
 }
